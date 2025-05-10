@@ -8,11 +8,17 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'Ecommerce',
-      component: () => import('../views/Ecommerce.vue'),
+      name: 'Login',
+      component: () => import('../views/Auth/login.vue'),
       meta: {
         title: 'eCommerce Dashboard',
       },
+    },
+    {
+      path:'/dashboard',
+      name:'Dashboard',
+      component:()=> import('../views/Ecommerce.vue'),
+
     },
     {
       path: '/calendar',
