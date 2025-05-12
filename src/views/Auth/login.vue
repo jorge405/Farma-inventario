@@ -4,6 +4,7 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import Cookies from 'js-cookie';
 import CryptoJS from 'crypto-js';
+import FullScreenLayout from '@/components/layout/FullScreenLayout.vue';
 export default{
     data(){
         return{
@@ -31,8 +32,10 @@ export default{
                     })
                     const usuario= CryptoJS.AES.encrypt(this.usuario, this.clave).toString();
                     const cod_usuario= CryptoJS.AES.encrypt(response.data.cod_usuario, this.clave).toString();
+                    const token= CryptoJS.AES.encrypt(response.data.token, this.clave).toString();
                     Cookies.set('usuario', usuario);
                     Cookies.set('cod_usuario', cod_usuario);  
+                    Cookies.set('token',token);
                     this.$router.push({name:'Dashboard'})
                     }else{
                         Swal.fire({
@@ -52,7 +55,7 @@ export default{
         }
     },
     components:{
-        
+        FullScreenLayout
     },  
 
 }
