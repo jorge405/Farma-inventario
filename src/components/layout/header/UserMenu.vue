@@ -1,3 +1,58 @@
+<script setup>
+import { UserCircleIcon, ChevronDownIcon, LogoutIcon, SettingsIcon, InfoCircleIcon } from '@/icons'
+import { RouterLink } from 'vue-router'
+import { ref, onMounted, onUnmounted } from 'vue'
+import Cookie from 'js-cookie'
+import CryptoJS from 'crypto-js'  
+const dropdownOpen = ref(false)
+const dropdownRef = ref(null)
+const clave='inventario1234'
+const user=ref(null)
+const menuItems = [
+  { href: '/profile', icon: UserCircleIcon, text: 'Edit profile' },
+  { href: '/chat', icon: SettingsIcon, text: 'Account settings' },
+  { href: '/profile', icon: InfoCircleIcon, text: 'Support' },
+]
+
+const getUser=()=>{
+  const usuario = CryptoJS.AES.decrypt(Cookie.get('usuario'), clave).toString(CryptoJS.enc.Utf8);
+  const cod_usuario = CryptoJS.AES.decrypt(Cookie.get('cod_usuario'), clave).toString(CryptoJS.enc.Utf8);
+  user.value=usuario;
+  console.log(user.value);
+}
+const toggleDropdown = () => {
+  dropdownOpen.value = !dropdownOpen.value
+}
+
+const closeDropdown = () => {
+  dropdownOpen.value = false
+}
+
+const signOut = () => {
+  // Implement sign out logic here
+  console.log('Signing out...')
+  closeDropdown()
+}
+
+const handleClickOutside = (event) => {
+  if (dropdownRef.value && !dropdownRef.value.contains(event.target)) {
+    closeDropdown()
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside),
+  getUser()
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
+</script>
+
+
+
+
 <template>
   <div class="relative" ref="dropdownRef">
     <button
@@ -8,7 +63,7 @@
         <img src="/images/user/owner.jpg" alt="User" />
       </span>
 
-      <span class="block mr-1 font-medium text-theme-sm">Musharof </span>
+      <span class="block mr-1 font-medium text-theme-sm">{{user}} </span>
 
       <ChevronDownIcon :class="{ 'rotate-180': dropdownOpen }" />
     </button>
@@ -57,45 +112,3 @@
   </div>
 </template>
 
-<script setup>
-import { UserCircleIcon, ChevronDownIcon, LogoutIcon, SettingsIcon, InfoCircleIcon } from '@/icons'
-import { RouterLink } from 'vue-router'
-import { ref, onMounted, onUnmounted } from 'vue'
-
-const dropdownOpen = ref(false)
-const dropdownRef = ref(null)
-
-const menuItems = [
-  { href: '/profile', icon: UserCircleIcon, text: 'Edit profile' },
-  { href: '/chat', icon: SettingsIcon, text: 'Account settings' },
-  { href: '/profile', icon: InfoCircleIcon, text: 'Support' },
-]
-
-const toggleDropdown = () => {
-  dropdownOpen.value = !dropdownOpen.value
-}
-
-const closeDropdown = () => {
-  dropdownOpen.value = false
-}
-
-const signOut = () => {
-  // Implement sign out logic here
-  console.log('Signing out...')
-  closeDropdown()
-}
-
-const handleClickOutside = (event) => {
-  if (dropdownRef.value && !dropdownRef.value.contains(event.target)) {
-    closeDropdown()
-  }
-}
-
-onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
-})
-
-onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside)
-})
-</script>
