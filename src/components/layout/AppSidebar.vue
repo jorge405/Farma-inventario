@@ -253,6 +253,11 @@ const menuGroups = [
         path:"/usuario"
       },
       {
+        icon:DocsIcon,
+        name:"Producto",
+        path:"/producto"
+      },
+      {
         icon: CalenderIcon,
         name: "Calendar",
         path: "/calendar",
