@@ -6,10 +6,11 @@ import Swal from 'sweetalert2';
 import Cookies from 'js-cookie';
 import CryptoJS from 'crypto-js';
 import inputPersonalizado from '@/components/forms/FormElements/inputPersonalizado.vue';
+import Complementos from './Complementos.vue';
 export default{
     data(){
         return{
-            users:[],
+            producto:null,
             clave:'inventario1234' ,
             tipo:[
                 {value:1,text:'Administrador'},
@@ -22,27 +23,39 @@ export default{
         }
     },
     methods:{
-        async getUsers(){
+        async getProducto(){
             try {
                 const token= CryptoJS.AES.decrypt(Cookies.get('token'), this.clave).toString(CryptoJS.enc.Utf8);
-                const response = await axios.get('http://localhost:3000/inventario/getUser',{
+                const response = await axios.get('http://localhost:3000/inventario/getProducto',{
                     headers:{
                         Authorization:`Bearer ${token}`
                     }
                 });
-                this.users = response.data;
+                
+                this.producto=response.data.datos;
+                
             } catch (error) {
-                console.error(error);
+                console.error(error); 
             }
-        }
+        },
+        formatFecha(fecha) {
+        if (!fecha) return ''; // Verifica si la fecha es nula o indefinida
+        const date = new Date(fecha);
+        const anio = date.getFullYear();
+        const mes = String(date.getMonth() + 1).padStart(2, '0'); // Mes empieza en 0
+        const Mes= mes ==='12' ? 'Diciembre' : mes==='11' ? 'Noviembre' : mes ==='10' ? 'Octubre' : mes ==='09' ? 'Septiembre' : mes==='08' ? 'Agosto' : mes === '07' ? 'Julio' : mes ==='06' ? 'Junio' : mes === '05' ? 'Mayo' : mes ==='04' ? 'Abril' : mes ==='03' ? 'Marzo' : mes==='02' ? 'Febrero' : mes==='01' ? 'Enero' : '00' 
+        const dia = String(date.getDate()).padStart(2, '0');
+        return `${dia}-${Mes}-${anio}`;
+    },
     },
     mounted(){
-        this.getUsers();
+        this.getProducto();
     },
     components:{
         AdminLayout,
         ComponentCard,
-        inputPersonalizado
+        inputPersonalizado,
+        Complementos
     },
 }
 </script>
@@ -182,7 +195,7 @@ export default{
                         </div>
 
                     </div>
-                    <button type="button" class="w-full text-white bg-blue-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Registrar</button>
+                    <button type="button" class="w-full text-white bg-blue-600 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Registrar</button>
                     
                 </form>
             
@@ -224,7 +237,7 @@ export default{
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                 <tr
-                    v-for="(user, index) in users"
+                    v-for="(item, index) in producto"
                     :key="index"
                     class="border-t border-gray-100 dark:border-gray-800"
                 >
@@ -235,13 +248,109 @@ export default{
                         </div>-->
                         <div>
                         <span class="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                            {{ user.usuario }}
+                            {{ item.nombre_comercial}}
                         </span>
                         </div>
                     </div>
                     </td>
                     
                     <td class="px-5 py-4 sm:px-6">
+                    <div class="flex items-center gap-3">
+                        <!--<div class="w-10 h-10 overflow-hidden rounded-full">
+                        <img :src="user.avatar" :alt="user.name" />
+                        </div>-->
+                        <div>
+                        <span class="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                            {{ item.nombre_cientifico}}
+                        </span>
+                        </div>
+                    </div>
+                    </td>
+                    <td class="px-5 py-4 sm:px-6">
+                    <div class="flex items-center gap-3">
+                        <!--<div class="w-10 h-10 overflow-hidden rounded-full">
+                        <img :src="user.avatar" :alt="user.name" />
+                        </div>-->
+                        <div>
+                        <span class="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                            {{ item.contenido}}
+                        </span>
+                        </div>
+                    </div>
+                    </td>
+                    <td class="px-5 py-4 sm:px-6">
+                    <div class="flex items-center gap-3">
+                        <!--<div class="w-10 h-10 overflow-hidden rounded-full">
+                        <img :src="user.avatar" :alt="user.name" />
+                        </div>-->
+                        <div>
+                        <span class="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                            {{ item.medicion}}
+                        </span>
+                        </div>
+                    </div>
+                    </td>
+                    <td class="px-5 py-4 sm:px-6">
+                    <div class="flex items-center gap-3">
+                        <!--<div class="w-10 h-10 overflow-hidden rounded-full">
+                        <img :src="user.avatar" :alt="user.name" />
+                        </div>-->
+                        <div>
+                        <span class="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                            {{ item.precio_unit}}
+                        </span>
+                        </div>
+                    </div>
+                    </td>
+                    <td class="px-5 py-4 sm:px-6">
+                    <div class="flex items-center gap-3">
+                        <!--<div class="w-10 h-10 overflow-hidden rounded-full">
+                        <img :src="user.avatar" :alt="user.name" />
+                        </div>-->
+                        <div>
+                        <span class="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                            {{ formatFecha(item.fecha_vencimiento)}}
+                        </span>
+                        </div>
+                    </div>
+                    </td>
+                    <td class="px-5 py-4 sm:px-6">
+                    <div class="flex items-center gap-3">
+                        <!--<div class="w-10 h-10 overflow-hidden rounded-full">
+                        <img :src="user.avatar" :alt="user.name" />
+                        </div>-->
+                        <div>
+                        <span class="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                            {{ item.laboratorio}}
+                        </span>
+                        </div>
+                    </div>
+                    </td>
+                    <td class="px-5 py-4 sm:px-6">
+                    <div class="flex items-center gap-3">
+                        <!--<div class="w-10 h-10 overflow-hidden rounded-full">
+                        <img :src="user.avatar" :alt="user.name" />
+                        </div>-->
+                        <div>
+                        <span class="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                            {{ item.presentacion}}
+                        </span>
+                        </div>
+                    </div>
+                    </td>
+                    <td class="px-5 py-4 sm:px-6">
+                    <div class="flex items-center gap-3">
+                        <!--<div class="w-10 h-10 overflow-hidden rounded-full">
+                        <img :src="user.avatar" :alt="user.name" />
+                        </div>-->
+                        <div>
+                        <span class="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                            {{ item.uso}}
+                        </span>
+                        </div>
+                    </div>
+                    </td>
+                    <!--<td class="px-5 py-4 sm:px-6">
                     <span
                         :class="[
                         'rounded-full px-2 py-0.5 text-theme-xs font-medium',
@@ -255,7 +364,7 @@ export default{
                     >
                         {{ user.estado_int === 1 ? 'Activo' : 'Inactivo' }}
                     </span>
-                    </td>
+                    </td>-->
                 </tr>
                 </tbody>
             </table>
@@ -263,5 +372,7 @@ export default{
         </div>
         </ComponentCard>
         </div>
+        <Complementos></Complementos>
     </AdminLayout>
+    
 </template>
