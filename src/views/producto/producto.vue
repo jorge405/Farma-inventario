@@ -4,9 +4,10 @@ import ComponentCard from "@/components/common/ComponentCard.vue";
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import Cookies from 'js-cookie';
-import CryptoJS from 'crypto-js';
-import inputPersonalizado from '@/components/forms/FormElements/inputPersonalizado.vue';
+import CryptoJS from 'crypto-js'
 import Complementos from './Complementos.vue';
+import flatPickr from 'vue-flatpickr-component'
+import 'flatpickr/dist/flatpickr.css'
 export default{
     data(){
         return{
@@ -16,10 +17,27 @@ export default{
                 {value:1,text:'Administrador'},
                 {value:2,text:'Operador'},
             ],
+            flatpickrTimeConfig:{
+            enableTime: true,
+            noCalendar: true,
+            dateFormat: 'H:i',
+            time_24hr: false,
+            minuteIncrement: 1,
+            wrap: false,
+            },
             selectedTipo:'',
             laboratorio:'',
             presentacion:'',
-            uso:''           
+            uso:'',
+            laboratorio_options:null,
+            presentacion_options:null,
+            uso_options:null,
+            nombre_comercial:'',
+            nombre_cientifico:'',
+            contenido:'',
+            medicion:'',
+            precio_unit:'',
+            fecha:null           
         }
     },
     methods:{
@@ -46,16 +64,112 @@ export default{
         const Mes= mes ==='12' ? 'Diciembre' : mes==='11' ? 'Noviembre' : mes ==='10' ? 'Octubre' : mes ==='09' ? 'Septiembre' : mes==='08' ? 'Agosto' : mes === '07' ? 'Julio' : mes ==='06' ? 'Junio' : mes === '05' ? 'Mayo' : mes ==='04' ? 'Abril' : mes ==='03' ? 'Marzo' : mes==='02' ? 'Febrero' : mes==='01' ? 'Enero' : '00' 
         const dia = String(date.getDate()).padStart(2, '0');
         return `${dia}-${Mes}-${anio}`;
-    },
+        },
+        async getComplementos(){
+            try {
+                const token= CryptoJS.AES.decrypt(Cookies.get('token'), this.clave).toString(CryptoJS.enc.Utf8);
+                const responseLaboratorio= await axios.get('http://localhost:3000/inventario/getLaboratorio',{
+                    headers:{
+                        Authorization:`Bearer ${token}`
+                    }
+                })
+
+                this.laboratorio_options=responseLaboratorio.data.datos;
+
+                const responsePresentacion= await axios.get('http://localhost:3000/inventario/getPresentacion',{
+                    headers:{
+                        Authorization:`Bearer ${token}`
+                    }
+                })
+                this.presentacion_options=responsePresentacion.data.datos;
+
+                const responseUso= await axios.get('http://localhost:3000/inventario/getUso',{
+                    headers:{
+                        Authorization:`Bearer ${token}`
+                    }
+                })
+                this.uso_options=responseUso.data.datos;
+            } catch (error) {
+                console.log('ha ocurrido un error: ',error)  
+    
+            }
+        },
+        async addProducto(){
+        const Toast= Swal.mixin({
+                        toast:true,
+                        position:"bottom-end",
+                        showConfirmButton:false,
+                        timer:3000,
+                        timerProgressBar:true,
+                        didOpen:(toast)=>{
+                            toast.onmouseenter=Swal.stopTimer;
+                            toast.onmouseleave=Swal.resumeTimer
+                        }
+                    })
+        try {
+            const token= CryptoJS.AES.decrypt(Cookies.get('token'), this.clave).toString(CryptoJS.enc.Utf8);
+            const responseProducto= await axios.post('http://localhost:3000/inventario/addProducto',{
+                nombre_comercial:this.nombre_comercial,
+                nombre_cientifico:this.nombre_cientifico,
+                contenido:this.contenido,
+                medicion:this.medicion,
+                precio_unit:this.precio_unit,
+                fecha_vencimiento:this.fecha,
+                cod_laboratorio:parseInt(this.laboratorio),
+                cod_presentacion:parseInt(this.presentacion),
+                cod_uso:parseInt(this.uso),
+                estado_int:1
+            },{
+                headers:{
+                    Authorization:`Bearer ${token}`
+                }
+            })
+            if (responseProducto.data.msg==='creado') {
+                Toast.fire({
+                    icon:'success',
+                    title:'sistema de inventario',
+                    text:'producto creado correctamente',
+                    theme:'dark'
+                })
+                this.getProducto();
+                this.nombre_comercial='';
+                this.nombre_cientifico='';
+                this.contenido='';
+                this.medicion='';
+                this.precio_unit='';
+
+            }else{
+                Toast.fire({
+                    icon:'error',
+                    title:'sistema de inventario',
+                    text:'producto no creado',
+                    theme:'dark'
+                })
+            }
+        } catch (error) {
+            console.log(error)
+            Toast.fire({
+                icon:'info',
+                title:'sistema de inventario',
+                text:'Problemas con el Servidor!!',
+                theme:'dark'
+            })
+        }
+        }
+
     },
     mounted(){
         this.getProducto();
+        this.getComplementos();
+    },
+    watch:{
+        
     },
     components:{
-        AdminLayout,
+        AdminLayout, 
         ComponentCard,
-        inputPersonalizado,
-        Complementos
+        Complementos,
+        flatPickr 
     },
 }
 </script>
@@ -66,22 +180,57 @@ export default{
         <div class="grid grid-cols-2 gap-6">
             <ComponentCard title="Crear Producto">
                 <form method="post">
-                    <div class=" grid grid-cols-2 sm:grid-col-1 space-y-6 space-x-2">
-                    <inputPersonalizado :label="'Nombre Comercial'" placeholder="ingrese nombre comercial" />
-                    <inputPersonalizado :label="'Nombre Cientifico'" placeholder="ingrese nombre cientifico" />
+                    <div class=" grid grid-cols-2 sm:grid-col-1 space-y-6 space-x-2 ">
+                    <div> 
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Nombre Comercial</label>
+                        <input type="text" v-model="nombre_comercial" placeholder="ingrese nombre comercial" class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"/>
+                    </div>
+                    <div> 
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Nombre Comercial</label>
+                        <input type="text" v-model="nombre_cientifico" placeholder="ingrese nombre cientifico" class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"/>
+                    </div>
                     </div>
                     <div class=" grid grid-cols-3 space-y-6 space-x-2 ">
-                        <input-personalizado :label="'Contenido'" placeholder="ingrese el contenido"></input-personalizado>
-                        <input-personalizado :label="'Medicion'" placeholder="ingrese la medicion"></input-personalizado>
-                        <input-personalizado :label="'Precio unitario'" placeholder="ingrese el precio"></input-personalizado>
+                        <div> 
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Contenido</label>
+                        <input type="text" v-model="contenido" placeholder="ingrese el contenido" class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"/>
+                        </div>
+                        <div> 
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Medicion</label>
+                        <input type="text" v-model="medicion" placeholder="ingrese la medicion" class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"/>
+                        </div>
+                        <div> 
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Precio unitario</label>
+                        <input type="text" v-model="precio_unit" placeholder="ingrese el precio" class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"/>
+                        </div>
+    
                     </div>
                     <div class=" grid xl:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 space-y-6 space-x-2">
                         <div>
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                            Seleccionar Fecha
-                            </label>
-                            <input type="date" class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pl-4 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"/>
-                        </div>    
+                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Date Picker Input</label>
+                            <div class="relative">
+                                <flat-pickr
+                                v-model="fecha"
+                                :config="flatpickrConfig"
+                                class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-700 bg-transparent bg-none px-4 py-2.5 pl-4 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-700 focus:border-brand-700 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
+                                placeholder="Select date"/>
+                                <span
+                                class="absolute text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2 dark:text-gray-400">
+                                <svg
+                                class="fill-current"
+                                width="20"
+                                height="20"
+                                viewBox="0 0 20 20"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                fill-rule="evenodd"
+                                clip-rule="evenodd"
+                                d="M6.66659 1.5415C7.0808 1.5415 7.41658 1.87729 7.41658 2.2915V2.99984H12.5833V2.2915C12.5833 1.87729 12.919 1.5415 13.3333 1.5415C13.7475 1.5415 14.0833 1.87729 14.0833 2.2915V2.99984L15.4166 2.99984C16.5212 2.99984 17.4166 3.89527 17.4166 4.99984V7.49984V15.8332C17.4166 16.9377 16.5212 17.8332 15.4166 17.8332H4.58325C3.47868 17.8332 2.58325 16.9377 2.58325 15.8332V7.49984V4.99984C2.58325 3.89527 3.47868 2.99984 4.58325 2.99984L5.91659 2.99984V2.2915C5.91659 1.87729 6.25237 1.5415 6.66659 1.5415ZM6.66659 4.49984H4.58325C4.30711 4.49984 4.08325 4.7237 4.08325 4.99984V6.74984H15.9166V4.99984C15.9166 4.7237 15.6927 4.49984 15.4166 4.49984H13.3333H6.66659ZM15.9166 8.24984H4.08325V15.8332C4.08325 16.1093 4.30711 16.3332 4.58325 16.3332H15.4166C15.6927 16.3332 15.9166 16.1093 15.9166 15.8332V8.24984Z"
+                                fill=""/></svg>
+                                </span>
+                            </div>
+                        </div>
                         <div>
                             <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                             Seleccionar Laboratorio
@@ -89,12 +238,12 @@ export default{
                             <div class="relative z-20 bg-transparent">
                                 <select
                                 v-model="laboratorio"    
-                                class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
+                                class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-700 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                                 :class="{ 'text-gray-800 dark:text-white/90':laboratorio }"
                                 >
                                 <option value="" selected disabled>Seleciona una opcion</option>
-                                <option v-for="item in tipo" :key="item.value" :value="item.text" class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
-                                    {{ item.text }}
+                                <option v-for="item in laboratorio_options " :key="item.cod_laboratorio" :value="item.cod_laboratorio" class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
+                                    {{ item.laboratorio }}
                                 </option>
                                 </select>
                                 <span
@@ -130,8 +279,8 @@ export default{
                                 :class="{ 'text-gray-800 dark:text-white/90':presentacion }"
                                 >
                                 <option value="" selected disabled>Seleciona una opcion</option>
-                                <option v-for="item in tipo" :key="item.value" :value="item.text" class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
-                                    {{ item.text }}
+                                <option v-for="item in presentacion_options" :key="item.cod_presentacion" :value="item.cod_presentacion" class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
+                                    {{ item.presentacion }}
                                 </option>
                                 </select>
                                 <span
@@ -158,7 +307,7 @@ export default{
                         </div>
                         <div>
                             <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                            Seleccionar Laboratorio
+                            Seleccionar Uso
                             </label>
                             <div class="relative z-20 bg-transparent">
                                 <select
@@ -167,8 +316,8 @@ export default{
                                 :class="{ 'text-gray-800 dark:text-white/90':uso }"
                                 >
                                 <option value="" selected disabled>Seleciona una opcion</option>
-                                <option v-for="item in tipo" :key="item.value" :value="item.text" class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
-                                    {{ item.text }}
+                                <option v-for="item in uso_options" :key="item.cod_uso" :value="item.cod_uso" class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
+                                    {{ item.uso }}
                                 </option>
                                 </select>
                                 <span
@@ -195,12 +344,12 @@ export default{
                         </div>
 
                     </div>
-                    <button type="button" class="w-full text-white bg-blue-600 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Registrar</button>
+                    <button type="button" @click="addProducto" class="w-full text-white bg-blue-600 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Registrar</button>
                     
                 </form>
             
         </ComponentCard>
-        <ComponentCard title="Lista de Usuarios">
+        <ComponentCard title="Lista de Producto">
         <div class="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
             <div class="max-w-full overflow-x-auto custom-scrollbar">
             <table class="min-w-full">
