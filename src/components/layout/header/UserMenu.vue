@@ -1,6 +1,6 @@
 <script setup>
 import { UserCircleIcon, ChevronDownIcon, LogoutIcon, SettingsIcon, InfoCircleIcon } from '@/icons'
-import { RouterLink } from 'vue-router'
+import { RouterLink,useRouter } from 'vue-router'
 import { ref, onMounted, onUnmounted } from 'vue'
 import Cookie from 'js-cookie'
 import CryptoJS from 'crypto-js'  
@@ -14,6 +14,7 @@ const menuItems = [
   { href: '/profile', icon: InfoCircleIcon, text: 'Support' },
 ]
 
+const router= useRouter();
 const getUser=()=>{
   const usuario = CryptoJS.AES.decrypt(Cookie.get('usuario'), clave).toString(CryptoJS.enc.Utf8);
   const cod_usuario = CryptoJS.AES.decrypt(Cookie.get('cod_usuario'), clave).toString(CryptoJS.enc.Utf8);
@@ -32,6 +33,12 @@ const signOut = () => {
   // Implement sign out logic here
   console.log('Signing out...')
   closeDropdown()
+}
+const cerrarSesion=()=>{
+  Cookie.remove('usuario')
+  Cookie.remove('cod_usuario')
+  Cookie.remove('token')
+  return router.push('/') 
 }
 
 const handleClickOutside = (event) => {
@@ -55,19 +62,17 @@ onUnmounted(() => {
 
 <template>
   <div class="relative" ref="dropdownRef">
-    <button
-      class="flex items-center text-gray-700 dark:text-gray-400"
-      @click.prevent="toggleDropdown"
-    >
+    
+      <div class="flex items-center text-gray-700 dark:text-gray-400">
       <span class="mr-3 overflow-hidden rounded-full h-11 w-11">
         <img src="/images/user/owner.jpg" alt="User" />
       </span>
 
       <span class="block mr-1 font-medium text-theme-sm">{{user}} </span>
 
-      <ChevronDownIcon :class="{ 'rotate-180': dropdownOpen }" />
-    </button>
-
+      <button @click="cerrarSesion"><i class=" pi pi-sign-out text-gray-dark rounded-full border border-gray-200  shadow-theme-lg dark:border-gray-800 dark:text-white hover:bg-gray-300 dark:hover:bg-gray-500  opacity-50 p-3"></i></button>
+      
+      </div>
     <!-- Dropdown Start -->
     <div
       v-if="dropdownOpen"

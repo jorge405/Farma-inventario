@@ -206,14 +206,14 @@
           </div>
         </div>
       </nav>
-      <SidebarWidget v-if="isExpanded || isHovered || isMobileOpen" />
+      
     </div>
   </aside>
 </template>
 
 <script setup>
 import { ref, computed } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute,useRouter } from "vue-router";
 
 import {
   GridIcon,
@@ -233,11 +233,20 @@ import {
 import SidebarWidget from "./SidebarWidget.vue";
 import BoxCubeIcon from "@/icons/BoxCubeIcon.vue";
 import { useSidebar } from "@/composables/useSidebar";
+import Cookie from 'js-cookie';
 
+ 
 const route = useRoute();
+const router= useRouter();
 
 const { isExpanded, isMobileOpen, isHovered, openSubmenu } = useSidebar();
 
+const cerrarSesion=()=>{
+  Cookie.remove('token')
+  Cookie.remove('cod_usuario')
+  Cookie.remove('usuario')
+  router.push('/login')
+}
 const menuGroups = [
   {
     title: "Menu",
@@ -245,7 +254,8 @@ const menuGroups = [
       {
         icon: GridIcon,
         name: "Dashboard",
-        subItems: [{ name: "Ecommerce", path: "/", pro: false }],
+        path:'/dashboard'
+        //subItems: [{ name: "Ecommerce", path: "/", pro: false }],
       },
       {
         icon:UserCircleIcon,
@@ -257,11 +267,11 @@ const menuGroups = [
         name:"Producto",
         path:"/producto"
       },
-      {
+      /*{
         icon: CalenderIcon,
         name: "Calendar",
         path: "/calendar",
-      },
+      }, */
       {
         icon: UserCircleIcon,
         name: "User Profile",
@@ -275,11 +285,11 @@ const menuGroups = [
           { name: "Form Elements", path: "/form-elements", pro: false },
         ],
       },
-      {
+      /*{
         name: "Tables",
         icon: TableIcon,
         subItems: [{ name: "Basic Tables", path: "/basic-tables", pro: false }],
-      },
+      }, */
       {
         name: "Pages",
         icon: PageIcon,
@@ -289,8 +299,11 @@ const menuGroups = [
         ],
       },
     ],
-  },
-  {
+  }
+  
+];
+
+const others={
     title: "Others",
     items: [
       {
@@ -314,18 +327,17 @@ const menuGroups = [
         ],
       },
       {
-        icon: PlugInIcon,
-        name: "Authentication",
-        subItems: [
+        icon:PlugInIcon,
+        name:"Authentication",
+        
+        /*subItems: [
           { name: "Signin", path: "/signin", pro: false },
           { name: "Signup", path: "/signup", pro: false },
-        ],
+        ],*/
       },
       // ... Add other menu items here
     ],
-  },
-];
-
+  }
 const isActive = (path) => route.path === path;
 
 const toggleSubmenu = (groupIndex, itemIndex) => {

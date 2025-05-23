@@ -6,11 +6,20 @@ import Swal from 'sweetalert2';
 import Cookies from 'js-cookie';
 import CryptoJS from 'crypto-js'
 import Complementos from './Complementos.vue';
+import Proveedor from '../proveedor/proveedor.vue';
 import flatPickr from 'vue-flatpickr-component'
 import 'flatpickr/dist/flatpickr.css'
+
 export default{
     data(){
         return{
+            personas:[
+                {id:1,nombre:'pedro'},
+                {id:2,nombre:'pepe'},
+                {id:3,nombre:'juan'},
+                {id:4,nombre:'gago'}
+            ],
+            detalle:[],
             producto:null,
             clave:'inventario1234' ,
             tipo:[
@@ -37,7 +46,8 @@ export default{
             contenido:'',
             medicion:'',
             precio_unit:'',
-            fecha:null           
+            fecha:null,
+            mostrarModal:false           
         }
     },
     methods:{
@@ -106,7 +116,7 @@ export default{
                             toast.onmouseleave=Swal.resumeTimer
                         }
                     })
-        try {
+        /*try {
             const token= CryptoJS.AES.decrypt(Cookies.get('token'), this.clave).toString(CryptoJS.enc.Utf8);
             const responseProducto= await axios.post('http://localhost:3000/inventario/addProducto',{
                 nombre_comercial:this.nombre_comercial,
@@ -137,6 +147,10 @@ export default{
                 this.contenido='';
                 this.medicion='';
                 this.precio_unit='';
+                this.laboratorio='';
+                this.presentacion='';
+                this.uso='';
+                this.fecha='';
 
             }else{
                 Toast.fire({
@@ -154,7 +168,44 @@ export default{
                 text:'Problemas con el Servidor!!',
                 theme:'dark'
             })
-        }
+        } */
+
+        
+        this.detalle.push({
+            nombre_comercial:this.nombre_comercial,
+            nombre_cientifico:this.nombre_cientifico,
+            contenido:this.contenido,
+            medicion:this.medicion,
+            precio_unit:this.precio_unit,
+            fecha_vencimiento:this.fecha,
+            cod_laboratorio:parseInt(this.laboratorio),
+            cod_presentacion:parseInt(this.presentacion),
+            cod_uso:parseInt(this.uso),
+            estado_int:1
+        })
+        Toast.fire({
+            icon:'success',
+            title:'sistema de inventario',
+            text:'medicamento agregado correctamente',
+            theme:'dark'
+        })
+        this.nombre_comercial='';
+        this.nombre_cientifico='';
+        this.contenido='';
+        this.medicion='';
+        this.precio_unit='';
+        this.laboratorio='';
+        this.presentacion='';
+        this.uso='';
+        },        
+        cerrarModal(){
+            this.mostrarModal=false;
+        },
+        abrirModal(){
+            this.mostrarModal=true;
+        },
+        detalleProducto(selected){
+            console.log(selected)
         }
 
     },
@@ -163,12 +214,13 @@ export default{
         this.getComplementos();
     },
     watch:{
-        
+         
     },
     components:{
         AdminLayout, 
         ComponentCard,
         Complementos,
+        Proveedor,
         flatPickr 
     },
 }
@@ -177,10 +229,87 @@ export default{
 
 <template>
     <AdminLayout>
+        <Proveedor></Proveedor>
         <div class="grid grid-cols-2 gap-6">
-            <ComponentCard title="Crear Producto">
+            <ComponentCard title="Registrar Compra">
+                 <div class=" grid grid-cols-3 gap-2 ">
+                        <div>
+                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Fecha vencimiento</label>
+                            <div class="relative">
+                                <flat-pickr
+                                v-model="fecha"
+                                :config="flatpickrConfig"
+                                class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-700 bg-transparent bg-none px-4 py-2.5 pl-4 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-700 focus:border-brand-700 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
+                                placeholder="ingrese fecha"/>
+                                <span
+                                class="absolute text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2 dark:text-gray-400">
+                                <svg
+                                class="fill-current"
+                                width="20"
+                                height="20"
+                                viewBox="0 0 20 20"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                fill-rule="evenodd"
+                                clip-rule="evenodd"
+                                d="M6.66659 1.5415C7.0808 1.5415 7.41658 1.87729 7.41658 2.2915V2.99984H12.5833V2.2915C12.5833 1.87729 12.919 1.5415 13.3333 1.5415C13.7475 1.5415 14.0833 1.87729 14.0833 2.2915V2.99984L15.4166 2.99984C16.5212 2.99984 17.4166 3.89527 17.4166 4.99984V7.49984V15.8332C17.4166 16.9377 16.5212 17.8332 15.4166 17.8332H4.58325C3.47868 17.8332 2.58325 16.9377 2.58325 15.8332V7.49984V4.99984C2.58325 3.89527 3.47868 2.99984 4.58325 2.99984L5.91659 2.99984V2.2915C5.91659 1.87729 6.25237 1.5415 6.66659 1.5415ZM6.66659 4.49984H4.58325C4.30711 4.49984 4.08325 4.7237 4.08325 4.99984V6.74984H15.9166V4.99984C15.9166 4.7237 15.6927 4.49984 15.4166 4.49984H13.3333H6.66659ZM15.9166 8.24984H4.08325V15.8332C4.08325 16.1093 4.30711 16.3332 4.58325 16.3332H15.4166C15.6927 16.3332 15.9166 16.1093 15.9166 15.8332V8.24984Z"
+                                fill=""/></svg>
+                                </span>
+                            </div>
+                        </div>
+                        <div> 
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Cantidad</label>
+                        <input type="text"  placeholder="ingrese cantidad" class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"/>
+                        </div>
+                        <div> 
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Precio</label>
+                        <input type="text"  placeholder="ingrese cantidad" class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"/>
+                        </div>
+                        <div>
+                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                            Seleccione proveedor
+                            </label>
+                            <div class="relative z-20 bg-transparent">
+                                <select
+                                v-model="laboratorio"    
+                                class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-700 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
+                                :class="{ 'text-gray-800 dark:text-white/90':laboratorio }"
+                                >
+                                <option value="" selected disabled>Seleciona una opcion</option>
+                                <option v-for="item in laboratorio_options " :key="item.cod_laboratorio" :value="item.cod_laboratorio" class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
+                                    {{ item.laboratorio }}
+                                </option>
+                                </select>
+                                <span
+                                class="absolute z-30 text-gray-700 -translate-y-1/2 pointer-events-none right-4 top-1/2 dark:text-gray-400"
+                                >
+                                <svg
+                                    class="stroke-current"
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 20 20"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path
+                                    d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396"
+                                    stroke=""
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    />
+                                </svg>
+                                </span>
+                            </div>
+                        </div>
+                        <button type="button" @click="abrirModal"  class=" mt-6 h-11 text-white bg-orange-500 hover:bg-orange-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-orange-500 dark:hover:bg-orange-700 dark:focus:ring-primary-800"><i class=" pi pi-eye mx-1"></i>Detalle</button>   
+                        
+                 </div>   
+                <hr class=" bg-gray-600">
+                <h3 class="text-gray-300 text-md font-semibold">Nuevo Producto</h3>
                 <form method="post">
-                    <div class=" grid grid-cols-2 sm:grid-col-1 space-y-6 space-x-2 ">
+                    <div class=" grid grid-cols-2 xs:grid-cols-1 space-y-6 space-x-2 ">
                     <div> 
                         <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Nombre Comercial</label>
                         <input type="text" v-model="nombre_comercial" placeholder="ingrese nombre comercial" class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"/>
@@ -207,13 +336,13 @@ export default{
                     </div>
                     <div class=" grid xl:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 space-y-6 space-x-2">
                         <div>
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Date Picker Input</label>
+                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Fecha vencimiento</label>
                             <div class="relative">
                                 <flat-pickr
                                 v-model="fecha"
                                 :config="flatpickrConfig"
                                 class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-700 bg-transparent bg-none px-4 py-2.5 pl-4 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-700 focus:border-brand-700 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
-                                placeholder="Select date"/>
+                                placeholder="ingrese fecha"/>
                                 <span
                                 class="absolute text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2 dark:text-gray-400">
                                 <svg
@@ -354,7 +483,7 @@ export default{
             <div class="max-w-full overflow-x-auto custom-scrollbar">
             <table class="min-w-full">
                 <thead>
-                <tr class="border-b border-gray-200 dark:border-gray-700">
+                    <tr class="border-b border-gray-200 dark:border-gray-700">
                     <th class="px-5 py-3 text-left w-3/11 sm:px-6">
                     <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Nombre comercial</p>
                     </th>
@@ -522,6 +651,84 @@ export default{
         </ComponentCard>
         </div>
         <Complementos></Complementos>
+            <transition
+                enter-active-class="transition duration-300 ease-out"
+                enter-from-class="opacity-0 scale-95"
+                enter-to-class="opacity-100 scale-100"
+                leave-active-class="transition duration-200 ease-in"
+                leave-from-class="opacity-100 scale-100"
+                leave-to-class="opacity-0 scale-95">
+        <div v-if="mostrarModal" class="fixed inset-0 flex items-center justify-center z-50">
+            <div class="bg-black bg-opacity-80 text-white max-w-2xl w-full p-6 rounded-xl shadow-2xl flex flex-col gap-2">
+                <div class="flex items-center justify-between">
+        <h2 class="text-lg font-semibold">Detalle de Compra</h2>
+        <button
+          @click="cerrarModal"
+          class="ml-2 text-white bg-red-600 hover:bg-red-700 rounded-full w-8 h-8 flex items-center justify-center"
+          aria-label="Cerrar">&times;</button>
+                </div>
+                    <!-- tabla contenido-->
+                <div class="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+                    <div class="max-w-full overflow-x-auto custom-scrollbar">
+                        <table class="min-w-full">
+                            <thead>
+                                <tr class="border-b border-gray-200 dark:border-gray-700">
+                                    <th class="px-5 py-3 text-left w-3/11 sm:px-6">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Medicamento</p>
+                                    </th>
+                                    <th class="px-5 py-3 text-left w-3/11 sm:px-6">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Contenido</p>
+                                    </th>
+                                    <th class="px-5 py-3 text-left w-3/11 sm:px-6">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Precio unit</p>
+                                    </th>
+                                    <th class="px-5 py-3 text-left w-3/11 sm:px-6">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Cantidad</p>
+                                    </th>
+                                    <th class="px-5 py-3 text-left w-3/11 sm:px-6">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Subtotal</p>
+                                    </th>
+                                    <th class="px-5 py-3 text-left w-3/11 sm:px-6">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Quit</p>
+                                    </th>
+                                </tr>
+                            </thead> 
+                            <tbody>
+                                <tr class="border-t border-gray-100 dark:border-gray-800" v-for="(item,index) in detalle" :key="index">
+                                    <td class="px-5 py-4 sm:px-6">
+                                        <div class="flex items-center gap-3">
+                                        <div>
+                                        <span class="block font-medium text-gray-800 text-theme-sm dark:text-white/90">{{ item.nombre_comercial }}</span>
+                                        </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-5 py-4 sm:px-6">
+                                        <div class="flex items-center gap-3">
+                                        <div>
+                                        <span class="block font-medium text-gray-800 text-theme-sm dark:text-white/90">{{ item.contenido }}</span>
+                                        </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-5 py-4 sm:px-6">
+                                        <div class="flex items-center gap-3">
+                                        <div>
+                                        <span class="block font-medium text-gray-800 text-theme-sm dark:text-white/90">{{ item.precio_unit }}</span>
+                                        </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-5 py-4 sm:px-6">
+                                        <span class="block font-medium text-gray-800 text-theme-sm dark:text-white/90 space-x-1">
+                                        <button @click="detalleProducto(item)"><i class="pi pi-trash rounded-full bg-red-500 p-1"></i></button>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>   
+                    </table>
+            </div>
+       </div>
+    </div>
+  </div>
+</transition>      
     </AdminLayout>
     
 </template>
