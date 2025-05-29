@@ -47,7 +47,8 @@ export default{
             medicion:'',
             precio_unit:'',
             fecha:null,
-            mostrarModal:false           
+            mostrarModal:false,
+            proveedor:null          
         }
     },
     methods:{
@@ -64,6 +65,24 @@ export default{
                 
             } catch (error) {
                 console.error(error); 
+            }
+        },
+        async getProveedor(){
+            try {
+                const token= CryptoJS.AES.decrypt(Cookies.get('token'), this.clave).toString(CryptoJS.enc.Utf8);
+                const responseProveedor= await axios.get('http://localhost:3000/inventario/getProveedor',{
+                    headers:{
+                        Authorization:`Bearer ${token}`
+                    }
+                })
+                if (responseProveedor.data.msg==='ok') {
+                    console.log(responseProveedor.data.datos)
+                    this.proveedor=responseProveedor.data.datos;
+                }else{ 
+                    this.proveedor=null;
+                }
+            } catch (error) {
+                console.log('ha ocurrido un error: ',error)                
             }
         },
         formatFecha(fecha) {
@@ -212,9 +231,10 @@ export default{
     mounted(){
         this.getProducto();
         this.getComplementos();
+        this.getProveedor();
     },
     watch:{
-         
+          
     },
     components:{
         AdminLayout, 
@@ -277,8 +297,8 @@ export default{
                                 :class="{ 'text-gray-800 dark:text-white/90':laboratorio }"
                                 >
                                 <option value="" selected disabled>Seleciona una opcion</option>
-                                <option v-for="item in laboratorio_options " :key="item.cod_laboratorio" :value="item.cod_laboratorio" class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
-                                    {{ item.laboratorio }}
+                                <option v-for="item in proveedor " :key="item.cod_proveedor" :value="item.nombre_proveedor" class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
+                                    {{ item.nombre_proveedor }}
                                 </option>
                                 </select>
                                 <span
