@@ -77,6 +77,9 @@ export default{
 <div class="grid grid-cols-1 gap-6 mt-4 mb-4">
 <ComponentCard title="Registrar Proveedor" >
     <div>
+        <div class=" justify-end flex "> 
+            <i class=" pi pi-plus text-white border-2 rounded-full p-2 border-gray-800 cursor-pointer hover:bg-gray-500 hover:transform hover:rotate-180 duration-300"></i>
+        </div>
         <form method="post">
             <div class="grid grid-cols-4 xs:grid-cols-2 gap-2">
                 <div> 

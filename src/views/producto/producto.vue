@@ -252,6 +252,9 @@ export default{
         <Proveedor></Proveedor>
         <div class="grid grid-cols-2 gap-6">
             <ComponentCard title="Registrar Compra">
+                <div class=" justify-end flex "> 
+                        <i class=" pi pi-plus text-white border-2 rounded-full p-2 border-gray-800 cursor-pointer hover:bg-gray-500 hover:transform hover:rotate-180 duration-300"></i>
+                </div>
                  <div class=" grid grid-cols-3 gap-2 ">
                         <div>
                             <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Fecha vencimiento</label>
@@ -499,6 +502,9 @@ export default{
             
         </ComponentCard>
         <ComponentCard title="Lista de Producto">
+            <div class=" justify-end flex "> 
+                <i class=" pi pi-plus text-white border-2 rounded-full p-2 border-gray-800 cursor-pointer hover:bg-gray-500 hover:transform hover:rotate-180 duration-300"></i>
+            </div>
         <div class="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
             <div class="max-w-full overflow-x-auto custom-scrollbar">
             <table class="min-w-full">

@@ -22,23 +22,24 @@
       <router-link to="/">
         <img
           v-if="isExpanded || isHovered || isMobileOpen"
-          class="dark:hidden"
-          src="/images/logo/logo.svg"
+          class="dark:hidden bg-gray p-2 bg-gray-300 rounded-xl"
+          src="../../assets/isologo.jpg"
           alt="Logo"
-          width="150"
-          height="40"
+          width="70"
+          height="70"
         />
         <img
           v-if="isExpanded || isHovered || isMobileOpen"
-          class="hidden dark:block"
-          src="/images/logo/logo-dark.svg"
+          class="hidden dark:block rounded-xl"
+          src="../../assets/isologo.jpg"
           alt="Logo"
-          width="150"
-          height="40"
+          width="70"
+          height="70"
         />
         <img
           v-else
-          src="/images/logo/logo-icon.svg"
+          class="rounded-xl"
+          src="../../assets/isologo.jpg"
           alt="Logo"
           width="32"
           height="32"
