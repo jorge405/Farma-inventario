@@ -180,11 +180,7 @@ export default{
                 </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                <tr
-                    v-for="(user, index) in users"
-                    :key="index"
-                    class="border-t border-gray-100 dark:border-gray-800"
-                >
+                <tr v-for="(user, index) in users" :key="index" class="border-t border-gray-100 dark:border-gray-800">
                     <td class="px-5 py-4 sm:px-6">
                     <div class="flex items-center gap-3">
                         <!--<div class="w-10 h-10 overflow-hidden rounded-full">
@@ -229,3 +225,4 @@ export default{
         </div>
     </AdminLayout>
 </template>
+
