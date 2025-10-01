@@ -48,7 +48,8 @@ export default{
             precio_unit:'',
             fecha:null,
             mostrarModal:false,
-            proveedor:null          
+            proveedor:null,
+            showCompra:false          
         }
     },
     methods:{
@@ -225,6 +226,9 @@ export default{
         },
         detalleProducto(selected){
             console.log(selected)
+        },
+        showMedicamento(){
+            this.showCompra=true;
         }
 
     },
@@ -251,11 +255,16 @@ export default{
     <AdminLayout>
         <Proveedor></Proveedor>
         <div class="grid grid-cols-1 gap-6">
-            <ComponentCard title="Registrar Compra" v-if="false">
-
+            <transition enter-active-class="transition duration-300 ease-out"
+                enter-from-class="opacity-0 scale-95"
+                enter-to-class="opacity-100 scale-100"
+                leave-active-class="transition duration-200 ease-in"
+                leave-from-class="opacity-100 scale-100"
+                leave-to-class="opacity-0 scale-95">
+            <ComponentCard title="Registrar Compra" v-if="showCompra">
                 <h3 class="text-gray-300 text-md font-semibold">Nuevo Producto</h3>
                 <form method="post">
-                    <div class=" grid grid-cols-2 xs:grid-cols-1 space-y-6 space-x-2 ">
+                    <div class=" grid grid-cols-2 xs:grid-cols-1 space-y-6 space-x-2 min-w-lg ">
                     <div> 
                         <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Nombre Comercial</label>
                         <input type="text" v-model="nombre_comercial" placeholder="ingrese nombre comercial" class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"/>
@@ -475,14 +484,17 @@ export default{
                         <button type="button" @click="abrirModal"  class=" mt-6 h-11 text-white bg-orange-500 hover:bg-orange-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-orange-500 dark:hover:bg-orange-700 dark:focus:ring-primary-800"><i class=" pi pi-eye mx-1"></i>Detalle</button>   
                         
                  </div>   
+                 
         </ComponentCard>
+        </transition> 
         <ComponentCard title="Lista de Producto">
             <div class=" flex justify-between">
                 <div class=" justify-start flex">
                 <input type="text" placeholder=" buscar producto" class=" bg-slate-600 min-w-lg rounded-lg p-2 text-sm text-slate-100">
             </div>
-            <div class=" justify-end flex "> 
-                <i class=" pi pi-plus text-white border-2 rounded-full p-2 border-gray-800 cursor-pointer hover:bg-gray-500 hover:transform hover:rotate-180 duration-300"></i>
+            <div class=" justify-end items-center flex space-x-4 ">
+                <p class=" font-Outfit text-sm text-slate-200">Nuevo medicamento</p> 
+                <i @click="showMedicamento" class=" pi pi-plus text-white border-2 rounded-full p-2 border-gray-800 cursor-pointer hover:bg-gray-500 hover:transform hover:rotate-180 duration-300"></i>
             </div>
             </div>
         <div class="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
@@ -664,6 +676,7 @@ export default{
                 leave-active-class="transition duration-200 ease-in"
                 leave-from-class="opacity-100 scale-100"
                 leave-to-class="opacity-0 scale-95">
+
         <div v-if="mostrarModal" class="fixed inset-0 flex items-center justify-center z-50">
             <div class="bg-black bg-opacity-80 text-white max-w-2xl w-full p-6 rounded-xl shadow-2xl flex flex-col gap-2">
                 <div class="flex items-center justify-between">
