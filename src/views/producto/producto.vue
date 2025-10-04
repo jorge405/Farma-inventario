@@ -254,17 +254,25 @@ export default{
 <template>
     <AdminLayout>
         <Proveedor></Proveedor>
-        <div class="grid grid-cols-1 gap-6">
-            <transition enter-active-class="transition duration-300 ease-out"
+        <transition 
+                enter-active-class="transition duration-300 ease-out"
                 enter-from-class="opacity-0 scale-95"
                 enter-to-class="opacity-100 scale-100"
                 leave-active-class="transition duration-200 ease-in"
                 leave-from-class="opacity-100 scale-100"
                 leave-to-class="opacity-0 scale-95">
-            <ComponentCard title="Registrar Compra" v-if="showCompra">
+                <div v-if="showCompra" class="fixed inset-0 z-[50] flex items-center justify-center"
+                >
+                                         
+                    <div class="relative bg-white dark:bg-gray-900 rounded-xl shadow-2xl p-8 w-full max-w-6xl max-h-[60vh] overflow-y-auto overflow-x-hidden flex flex-col items-center ml-56">
+                        <button
+                            @click="showCompra = false"
+                            class="absolute top-4 right-4 text-gray-700 dark:text-gray-200 bg-red-600 hover:bg-red-700 rounded-full w-8 h-8 flex items-center justify-center"
+                            aria-label="Cerrar">&times;</button>
+                            <ComponentCard title="Registrar Compra">
                 <h3 class="text-gray-300 text-md font-semibold">Nuevo Producto</h3>
                 <form method="post">
-                    <div class=" grid grid-cols-2 xs:grid-cols-1 space-y-6 space-x-2 min-w-lg ">
+                    <div class=" grid grid-cols-2 xs:grid-cols-1 space-y-6 space-x-2 min-w-5xl ">
                     <div> 
                         <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Nombre Comercial</label>
                         <input type="text" v-model="nombre_comercial" placeholder="ingrese nombre comercial" class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"/>
@@ -486,7 +494,12 @@ export default{
                  </div>   
                  
         </ComponentCard>
-        </transition> 
+                    </div>
+
+                </div>
+        </transition>
+        <div class="grid grid-cols-1 gap-6">
+            <div class=" font-Outfit text-2xl text-gray-200">Productos</div>
         <ComponentCard title="Lista de Producto">
             <div class=" flex justify-between">
                 <div class=" justify-start flex">
