@@ -46,7 +46,10 @@ export default{
             contenido:'',
             medicion:'',
             precio_unit:'',
-            fecha:null,
+            fecha_vencimiento:null,
+            cantidad_inicial:null,
+            precio_compra:null,
+            cod_proveedor:null,
             mostrarModal:false,
             proveedor:null,
             showCompra:false          
@@ -231,7 +234,24 @@ export default{
             this.showCompra=true;
         },
         ingresarMedicamento(){
+            const detalleMedicamento=[];
             
+            const medicamento={
+                nombre_comercial: this.nombre_comercial,
+                nombre_cientificp: this.nombre_cientifico,
+                contenido:this.contenido,
+                medicion:this.medicion,
+                precio_unit:this.precio_unit,
+                fecha_vencimiento:this.fecha_vencimiento,
+                cod_laboratorio:parseInt(this.laboratorio),
+                cod_presentacion:parseInt(this.presentacion),
+                cod_uso:parseInt(this.uso),
+                cantidad_inicial:this.cantidad_inicial,
+                precio_compra:this.precio_compra
+            }
+            this.detalle.push(medicamento)
+            console.log(this.detalle)
+           
         }
     },
     mounted(){
@@ -240,7 +260,9 @@ export default{
         this.getProveedor();
     },
     watch:{
-          
+          ingresarMedicamento(){
+            console.log(this.detalle)
+          }
     },
     components:{
         AdminLayout, 
@@ -265,7 +287,7 @@ export default{
                 leave-to-class="opacity-0 scale-95">
                 <div v-if="showCompra" class="fixed inset-0 z-[50] flex items-center justify-center mt-15">
                                          
-                    <div class="relative bg-white dark:bg-gray-900 rounded-xl shadow-2xl  w-full max-w-4xl h-[550px] overflow-y-auto overflow-x-hidden flex flex-col items-center ml-56">
+                    <div class="relative bg-white dark:bg-gray-900 rounded-xl shadow-2xl  w-full max-w-5xl h-[550px] overflow-y-auto overflow-x-hidden flex flex-col items-center ml-56">
                         <button
                             @click="showCompra = false"
                             class="absolute top-4 right-4 text-gray-700 dark:text-gray-200 bg-red-600 hover:bg-red-700 rounded-full w-8 h-8 flex items-center justify-center"
@@ -280,7 +302,7 @@ export default{
                                     <input type="text" v-model="nombre_comercial" placeholder="ingrese nombre comercial" class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"/>
                                 </div>
                                 <div> 
-                                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Nombre Comercial</label>
+                                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Nombre Cientifico</label>
                                     <input type="text" v-model="nombre_cientifico" placeholder="ingrese nombre cientifico" class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"/>
                                 </div>
                                 <div> 
@@ -301,7 +323,7 @@ export default{
                                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Fecha vencimiento</label>
                                     <div class="relative">
                                         <flat-pickr
-                                        v-model="fecha"
+                                        v-model="fecha_vencimiento"
                                         :config="flatpickrConfig"
                                         class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-700 bg-transparent bg-none px-4 py-2.5 pl-4 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-700 focus:border-brand-700 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                                         placeholder="ingrese fecha"/>
@@ -329,36 +351,40 @@ export default{
                                     Seleccionar Laboratorio
                                     </label>
                                     <div class="relative z-20 bg-transparent">
-                                        <select
-                                        v-model="laboratorio"    
-                                        class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-700 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
-                                        :class="{ 'text-gray-800 dark:text-white/90':laboratorio }"
-                                        >
-                                        <option value="" selected disabled>Seleciona una opcion</option>
-                                        <option v-for="item in laboratorio_options " :key="item.cod_laboratorio" :value="item.cod_laboratorio" class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
-                                            {{ item.laboratorio }}
-                                        </option>
-                                        </select>
-                                        <span
-                                        class="absolute z-30 text-gray-700 -translate-y-1/2 pointer-events-none right-4 top-1/2 dark:text-gray-400"
-                                        >
-                                        <svg
-                                            class="stroke-current"
-                                            width="20"
-                                            height="20"
-                                            viewBox="0 0 20 20"
-                                            fill="none"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                            <path
-                                            d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396"
-                                            stroke=""
-                                            stroke-width="1.5"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            />
-                                        </svg>
-                                        </span>
+                                        <div class=" flex flex-row space-x-2 items-center">
+                                            <select
+                                                v-model="laboratorio"    
+                                                class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-700 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
+                                                :class="{ 'text-gray-800 dark:text-white/90':laboratorio }">
+                                            <option value="" selected disabled>Seleciona una opcion</option>
+                                            <option v-for="item in laboratorio_options " :key="item.cod_laboratorio" :value="item.cod_laboratorio" class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
+                                                {{ item.laboratorio }}
+                                            </option>
+                                            </select>
+                                            <span
+                                            class="absolute z-30 text-gray-700 -translate-y-1/2 pointer-events-none right-4 top-1/2 dark:text-gray-400"
+                                            >
+                                            <svg
+                                                class="stroke-current"
+                                                width="20"
+                                                height="20"
+                                                viewBox="0 0 20 20"
+                                                fill="none"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                            >
+                                                <path
+                                                d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396"
+                                                stroke=""
+                                                stroke-width="1.5"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                />
+                                            </svg>
+                                            </span>
+                                            <i class="pi pi-pen-to-square text-white cursor-pointer transition-all "></i>
+                                        </div>
+                                        
+                                        
                                     </div>
                                 </div>
                                 <div>
@@ -366,7 +392,8 @@ export default{
                                     Seleccionar presentacion
                                     </label>
                                     <div class="relative z-20 bg-transparent">
-                                        <select
+                                        <div class=" flex flex-row space-x-2 items-center">
+                                            <select
                                         v-model="presentacion"    
                                         class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                                         :class="{ 'text-gray-800 dark:text-white/90':presentacion }"
@@ -396,6 +423,9 @@ export default{
                                             />
                                         </svg>
                                         </span>
+                                        <i class="pi pi-pen-to-square text-white cursor-pointer transition-all"></i>
+                                        </div>
+                                        
                                     </div>
                                 </div>
                                 <div>
@@ -403,6 +433,7 @@ export default{
                                     Seleccionar Uso
                                     </label>
                                     <div class="relative z-20 bg-transparent">
+                                        <div class=" flex flex-row space-x-2 items-center">
                                         <select
                                         v-model="uso"    
                                         class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
@@ -433,31 +464,32 @@ export default{
                                             />
                                         </svg>
                                         </span>
+                                        <i class="pi pi-pen-to-square text-white cursor-pointer transition-all"></i>
+                                        </div>
                                     </div>
                                 </div>
 
                             </div>
                             <hr class=" border-gray-700 border-1 w-3xl my-5">
-                            <div class=" grid grid-cols-3 gap-2 ">
+                            <div class=" grid grid-cols-4 gap-2 ">
                                     <div> 
                                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Cantidad inicial</label>
-                                    <input type="text"  placeholder="ingrese cantidad" class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"/>
+                                    <input type="text" v-model="cantidad_inicial"  placeholder="ingrese cantidad" class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"/>
                                     </div>
                                     <div> 
                                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Precio</label>
-                                    <input type="text"  placeholder="ingrese cantidad" class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"/>
+                                    <input type="text" v-model="precio_compra"  placeholder="ingrese cantidad" class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"/>
                                     </div>
                                     <div class=" flex flex-col">
                                         <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                                         Seleccione proveedor
                                         </label>
                                         <div class="relative z-20 bg-transparent">
-                                            <div class=" flex flex-row space-x-2 items-center">
-                                                <select
-                                            v-model="laboratorio"    
+                                            
+                                            <select
+                                            v-model="cod_proveedor"    
                                             class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-700 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 cursor-pointer"
-                                            :class="{ 'text-gray-800 dark:text-white/90':laboratorio }"
-                                            >
+                                            :class="{ 'text-gray-800 dark:text-white/90':cod_proveedor }">
                                             <option value="" selected disabled>Seleciona una opcion</option>
                                             <option v-for="item in proveedor " :key="item.cod_proveedor" :value="item.nombre_proveedor" class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
                                                 {{ item.nombre_proveedor }}
@@ -484,17 +516,14 @@ export default{
                                                 />
                                             </svg>
                                             </span>
-                                            <i class=" pi pi-pen-to-square text-white cursor-pointer transition-all"></i>
-                                            </div>
-                                            
-                                            
+                
                                         </div>
                                     </div>
                                     
-                                    <button v-if="false" type="button" @click="abrirModal"  class=" mt-6 h-11 text-white bg-orange-500 hover:bg-orange-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-orange-500 dark:hover:bg-orange-700 dark:focus:ring-primary-800"><i class=" pi pi-eye mx-1"></i>Detalle</button>   
                                     
+                            <button v-if="true" type="button" @click="abrirModal"  class=" mt-6 h-11 text-white bg-orange-500 hover:bg-orange-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-orange-500 dark:hover:bg-orange-700 dark:focus:ring-primary-800"><i class=" pi pi-eye mx-1"></i>Detalle</button>           
                             </div>
-                            <button type="button" @click="addProducto" class="w-full text-white bg-blue-600 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 mt-5">Registrar</button>
+                            <button type="button" @click="ingresarMedicamento" class="w-full text-white bg-blue-600 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 mt-5">Registrar</button>
                         </form>
                     </div>
 
@@ -693,7 +722,7 @@ export default{
                 leave-to-class="opacity-0 scale-95">
 
         <div v-if="mostrarModal" class="fixed inset-0 flex items-center justify-center z-50">
-            <div class="bg-black bg-opacity-80 text-white max-w-2xl w-full p-6 rounded-xl shadow-2xl flex flex-col gap-2">
+            <div class="bg-black bg-opacity-80 text-white max-w-3/4 ml-56 w-full p-6 rounded-xl shadow-2xl flex flex-col gap-2">
                 <div class="flex items-center justify-between">
         <h2 class="text-lg font-semibold">Detalle de Compra</h2>
         <button
@@ -708,13 +737,31 @@ export default{
                             <thead>
                                 <tr class="border-b border-gray-200 dark:border-gray-700">
                                     <th class="px-5 py-3 text-left w-3/11 sm:px-6">
-                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Medicamento</p>
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Comercial</p>
+                                    </th>
+                                    <th class="px-5 py-3 text-left w-3/11 sm:px-6">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Cientifico</p>
                                     </th>
                                     <th class="px-5 py-3 text-left w-3/11 sm:px-6">
                                     <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Contenido</p>
                                     </th>
                                     <th class="px-5 py-3 text-left w-3/11 sm:px-6">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Medicion</p>
+                                    </th>
+                                    <th class="px-5 py-3 text-left w-3/11 sm:px-6">
                                     <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Precio unit</p>
+                                    </th>
+                                    <th class="px-5 py-3 text-left w-3/11 sm:px-6">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">fecha V.</p>
+                                    </th>
+                                    <th class="px-5 py-3 text-left w-3/11 sm:px-6">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">laboratorio</p>
+                                    </th>
+                                    <th class="px-5 py-3 text-left w-3/11 sm:px-6">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">presentacion</p>
+                                    </th>
+                                    <th class="px-5 py-3 text-left w-3/11 sm:px-6">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">uso</p>
                                     </th>
                                     <th class="px-5 py-3 text-left w-3/11 sm:px-6">
                                     <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Cantidad</p>
@@ -723,7 +770,7 @@ export default{
                                     <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Subtotal</p>
                                     </th>
                                     <th class="px-5 py-3 text-left w-3/11 sm:px-6">
-                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Quit</p>
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Quitar</p>
                                     </th>
                                 </tr>
                             </thead> 
